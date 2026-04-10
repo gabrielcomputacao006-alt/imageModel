@@ -1,0 +1,343 @@
+<<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gabriel Baviera Araujo — IA Visual</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <style>
+    :root {
+      --accent: #6c63ff;
+      --accent-dark: #4b44cc;
+      --card-bg: #ffffff;
+      --body-bg: #f4f3ff;
+    }
+
+    body {
+      background: var(--body-bg);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      background: linear-gradient(135deg, #6c63ff 0%, #4b44cc 100%);
+      color: #fff;
+      padding: 2rem 1rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
+    }
+
+    .site-header h1 {
+      font-size: clamp(1.3rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .site-header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin: 0;
+    }
+
+    .main-card {
+      background: var(--card-bg);
+      border-radius: 1.25rem;
+      box-shadow: 0 8px 32px rgba(108, 99, 255, 0.10);
+      padding: 2rem;
+      margin-top: -1rem;
+    }
+
+    #webcam-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f0eeff;
+      border-radius: 1rem;
+      min-height: 220px;
+      overflow: hidden;
+      border: 2px dashed #c4bfff;
+      position: relative;
+    }
+
+    #webcam-wrapper.active {
+      border: 2px solid #6c63ff;
+      background: #000;
+    }
+
+    #webcam-placeholder {
+      text-align: center;
+      color: #a09cc4;
+    }
+
+    #webcam-placeholder i {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    #webcam-container canvas {
+      border-radius: 0.75rem;
+      max-width: 100%;
+      display: block;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #6c63ff, #4b44cc);
+      color: #fff;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(108, 99, 255, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(108, 99, 255, 0.45);
+      color: #fff;
+    }
+
+    .btn-start:active {
+      transform: scale(0.97);
+    }
+
+    .btn-start:disabled {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .permission-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 2rem;
+      font-weight: 500;
+    }
+
+    .permission-badge.off {
+      background: #fff0f0;
+      color: #c0392b;
+      border: 1px solid #f5c6cb;
+    }
+
+    .permission-badge.on {
+      background: #eafaf1;
+      color: #1e8449;
+      border: 1px solid #a9dfbf;
+    }
+
+    .label-card {
+      background: #f8f7ff;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.6rem;
+      border: 1px solid #e4e0ff;
+    }
+
+    .label-card .class-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4b44cc;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .label-card .prob-text {
+      font-size: 0.75rem;
+      color: #6c757d;
+      text-align: right;
+      min-width: 38px;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 1rem;
+      background: #e4e0ff;
+      flex: 1;
+    }
+
+    .progress-bar {
+      border-radius: 1rem;
+      background: linear-gradient(90deg, #6c63ff, #a29bfe);
+      transition: width 0.3s ease;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a09cc4;
+      margin-bottom: 0.75rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #a09cc4;
+      padding: 1.5rem 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <h1><i class="bi bi-cpu me-2"></i>Reconhecimento Visual com IA</h1>
+    <p>Gabriel Baviera Araujo &mdash; Teachable Machine</p>
+  </header>
+
+  <main class="container py-4" style="max-width: 720px;">
+    <div class="main-card">
+
+      <div class="row g-4">
+
+        <div class="col-12 col-md-6">
+          <p class="section-title"><i class="bi bi-camera-video me-1"></i>Câmera</p>
+
+          <div id="webcam-wrapper" class="mb-3">
+            <div id="webcam-placeholder">
+              <i class="bi bi-camera"></i>
+              <span style="font-size:0.85rem;">Câmera inativa</span>
+            </div>
+            <div id="webcam-container"></div>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <button class="btn-start" id="btn-start" onclick="init()">
+              <i class="bi bi-play-circle-fill"></i> Ativar câmera
+            </button>
+            <span class="permission-badge off" id="perm-badge">
+              <i class="bi bi-lock-fill"></i> Permissão pendente
+            </span>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <p class="section-title"><i class="bi bi-bar-chart-line me-1"></i>Resultados</p>
+          <div id="label-container">
+            <div class="text-center text-muted" style="font-size:0.85rem; padding: 2rem 0;" id="no-results-msg">
+              <i class="bi bi-hourglass" style="font-size:1.8rem; display:block; margin-bottom:0.5rem;"></i>
+              Aguardando modelo...
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Gabriel Baviera Araujo &mdash; Projeto IA com Teachable Machine
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    const URL = "https://teachablemachine.withgoogle.com/models/b1K-DgEXw/";
+    let model, webcam, labelContainer, maxPredictions;
+    let labelCards = [];
+
+    async function init() {
+      const btn = document.getElementById('btn-start');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Carregando...';
+
+      try {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        const flip = true;
+        webcam = new tmImage.Webcam(300, 300, flip);
+        await webcam.setup();
+        await webcam.play();
+
+        document.getElementById('webcam-placeholder').style.display = 'none';
+        document.getElementById('webcam-wrapper').classList.add('active');
+        document.getElementById('webcam-container').appendChild(webcam.canvas);
+
+        const badge = document.getElementById('perm-badge');
+        badge.className = 'permission-badge on';
+        badge.innerHTML = '<i class="bi bi-unlock-fill"></i> Câmera ativa';
+
+        btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Ativo';
+
+        const noMsg = document.getElementById('no-results-msg');
+        if (noMsg) noMsg.remove();
+
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = '';
+        labelCards = [];
+
+        for (let i = 0; i < maxPredictions; i++) {
+          const card = document.createElement('div');
+          card.className = 'label-card';
+
+          const nameRow = document.createElement('div');
+          nameRow.className = 'class-name';
+          nameRow.textContent = '—';
+
+          const bottomRow = document.createElement('div');
+          bottomRow.className = 'd-flex align-items-center gap-2';
+
+          const progressWrap = document.createElement('div');
+          progressWrap.className = 'progress';
+          const bar = document.createElement('div');
+          bar.className = 'progress-bar';
+          bar.style.width = '0%';
+          progressWrap.appendChild(bar);
+
+          const probText = document.createElement('div');
+          probText.className = 'prob-text';
+          probText.textContent = '0%';
+
+          bottomRow.appendChild(progressWrap);
+          bottomRow.appendChild(probText);
+          card.appendChild(nameRow);
+          card.appendChild(bottomRow);
+          labelContainer.appendChild(card);
+
+          labelCards.push({ nameEl: nameRow, bar, probText });
+        }
+
+        window.requestAnimationFrame(loop);
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Erro — Tentar novamente';
+        console.error(err);
+      }
+    }
+
+    async function loop() {
+      webcam.update();
+      await predict();
+      window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+      const prediction = await model.predict(webcam.canvas);
+      for (let i = 0; i < maxPredictions; i++) {
+        const p = prediction[i];
+        const pct = (p.probability * 100).toFixed(1);
+        labelCards[i].nameEl.textContent = p.className;
+        labelCards[i].bar.style.width = pct + '%';
+        labelCards[i].probText.textContent = pct + '%';
+      }
+    }
+  </script>
+
+</body>
+</html>
